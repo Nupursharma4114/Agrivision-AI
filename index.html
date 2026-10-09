@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AgriVision AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef4ec;--card:#fff;--ink:#14201a;--mut:#5a6b60;--g:#2e7d4f;--g2:#dcefe1;--soil:#8a5a2b;--bd:#cfdccf;--warn:#fff4dc;--warnb:#e2b24a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a14;--card:#18261d;--ink:#e6f0e8;--mut:#9bb0a2;--g:#5fc388;--g2:#1f3a2a;--soil:#d1a06a;--bd:#2a3d31;--warn:#35290f;--warnb:#a67c1f}}
+:root[data-theme="dark"]{--bg:#101a14;--card:#18261d;--ink:#e6f0e8;--mut:#9bb0a2;--g:#5fc388;--g2:#1f3a2a;--soil:#d1a06a;--bd:#2a3d31;--warn:#35290f;--warnb:#a67c1f}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Hind,system-ui,sans-serif}
+header{max-width:1000px;margin:0 auto;padding:20px 16px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font:700 28px Fraunces,Georgia,serif;margin:0;letter-spacing:-.5px}
+h1 small{display:block;font:500 14px Hind,sans-serif;color:var(--mut);letter-spacing:0}
+.seg{display:flex;border:1.5px solid var(--g);border-radius:99px;overflow:hidden}
+.seg button{border:0;background:none;color:var(--g);padding:7px 18px;font:600 15px Hind;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--g);color:#fff}
+main{max-width:1000px;margin:0 auto;padding:8px 16px 40px;display:grid;grid-template-columns:1fr 1.1fr;gap:16px}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px}
+h2{font:600 18px Fraunces,Georgia,serif;margin:0 0 10px}
+.drop{border:2px dashed var(--g);border-radius:12px;min-height:220px;display:grid;place-items:center;text-align:center;overflow:hidden;background:var(--g2);cursor:pointer;position:relative}
+.drop img,.drop canvas{max-width:100%;max-height:300px;display:block}
+.drop p{margin:0;padding:20px;color:var(--mut)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button.b{border:1.5px solid var(--g);background:var(--card);color:var(--g);border-radius:10px;padding:8px 14px;font:600 14px Hind;cursor:pointer}
+button.b.p{background:var(--g);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--soil);outline-offset:2px}
+.bar{height:10px;background:var(--g2);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g)}
+.res h3{margin:4px 0 2px;font:700 22px Fraunces,Georgia,serif}
+.cf{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:14px}.cf .bar{flex:1}
+.alt{font-size:13px;color:var(--mut);margin-top:8px}
+.warn{background:var(--warn);border-left:4px solid var(--warnb);padding:8px 12px;border-radius:6px;font-size:14px;margin-top:10px}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto;padding:4px 2px}
+.m{padding:9px 13px;border-radius:14px;max-width:92%;white-space:pre-wrap}
+.m.u{align-self:flex-end;background:var(--g);color:#fff;border-bottom-right-radius:4px}
+.m.a{align-self:flex-start;background:var(--g2);border-bottom-left-radius:4px}
+.ask{display:flex;gap:8px;margin-top:10px}
+.ask input{flex:1;min-width:0;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--ink);font:16px Hind}
+.mic[aria-pressed=true]{background:#c0392b;border-color:#c0392b;color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips button{border:1px solid var(--bd);background:var(--bg);color:var(--ink);border-radius:99px;padding:4px 11px;font:14px Hind;cursor:pointer}
+select{padding:7px;border-radius:8px;border:1.5px solid var(--bd);background:var(--bg);color:var(--ink);font:14px Hind;max-width:100%}
+.how{grid-column:1/-1;font-size:14px;color:var(--mut)}
+.hidden{display:none}
+.big{width:100%;font-size:18px;padding:12px;border-radius:12px;box-shadow:0 5px 16px rgba(46,125,79,.45)}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+label.b{display:inline-block;border:1.5px solid var(--g);background:var(--card);color:var(--g);border-radius:10px;padding:8px 14px;font:600 14px Hind;cursor:pointer}
+label.b.p{background:var(--g);color:#fff}
+#camBox{margin-top:10px;border-radius:12px;overflow:hidden;background:#000;position:relative}
+#camBox video{width:100%;max-height:340px;display:block;object-fit:cover}
+#camBox .row{position:absolute;bottom:8px;left:0;right:0;justify-content:center;margin:0}
+</style>
+</head>
+<body>
+<header>
+  <h1>AgriVision AI<small id="tag"></small></h1>
+  <div class="seg" role="group" aria-label="Language"><button id="lEn" aria-pressed="true">English</button><button id="lHi" aria-pressed="false">हिन्दी</button></div>
+</header>
+<main>
+  <section class="card">
+    <h2 id="t1"></h2>
+    <label class="drop" id="drop" for="file"><p id="dropT"></p></label>
+    <input type="file" id="file" accept="image/*" class="vh">
+    <input type="file" id="cam" accept="image/*" capture="environment" class="vh">
+    <div id="camBox" class="hidden"><video id="vid" playsinline autoplay muted></video><div class="row"><button class="b p" id="snap"></button><button class="b" id="camClose"></button></div></div>
+    <div class="warn hidden" id="camNote"></div>
+    <div class="row">
+      <button class="b p" id="camBtn"></button><button class="b p" id="upBtn"></button></div>
+    <div class="row"><button class="b p big" id="analyze"></button></div>
+    <div class="row">
+      <button class="b" id="s1"></button><button class="b" id="s2"></button><button class="b" id="s3"></button>
+    </div>
+    <div class="res" id="res" style="margin-top:14px"></div>
+    <div class="row" id="ovr" style="align-items:center"><span id="ovrL" style="font-size:14px;color:var(--mut)"></span><select id="sel"></select></div>
+  </section>
+  <section class="card">
+    <h2 id="t2"></h2>
+    <div class="chat" id="chat" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <div class="ask">
+      <button class="b mic" id="mic" aria-pressed="false"></button>
+      <input id="q" type="text">
+      <button class="b p" id="send"></button>
+    </div>
+    <div class="row"><label style="font-size:14px"><input type="checkbox" id="speak" checked> <span id="spkL"></span></label><button class="b" id="stop"></button></div>
+    <div class="alt" id="vnote"></div>
+  </section>
+  <p class="how" id="how"></p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let lang='en',cur=null,imgReady=false;
+const UI={
+en:{tag:'Plant disease detection and advice, by photo and voice',t1:'1. Show the plant',drop:'Tap to take or upload a photo of the affected leaf',an:'Upload',cam:'📷 Take a photo',live:'Live camera',camErr:'Live camera is blocked in this view. Tap "Take photo" to open your phone camera, or open the page in a full browser tab.',up:'🖼 Browse',snap:'Capture',close:'Close camera',s:['Sample: dark spots','Sample: white powder','Sample: yellow leaf'],t2:'2. Ask a question',ph:'Ask about your plant…',mic:'🎤 Speak',micOn:'● Listening',send:'Send',spk:'Read answers aloud',stop:'Stop voice',conf:'Confidence',other:'Other possibilities',ovr:'Not right? Choose manually:',
+hello:'Hello! Add a photo of your plant, then ask me what is wrong or how to treat it.',noimg:'Please add a plant photo first, then press Upload.',noSTT:'Voice input is not supported in this browser. Type your question instead (Chrome works best).',
+chips:['What is this disease?','How do I treat it?','How can I prevent it?','Why did this happen?','Is it safe to spray?'],
+how:'How it works: photo → image analysis → knowledge base → answer in text and voice. This demo runs fully in your browser (offline-capable). Detection here uses a lightweight colour-pattern analyzer so it works without a server; the production app swaps this step for a trained MobileNetV2 / TensorFlow Lite model.',
+sum:'Summary',sym:'Symptoms',cau:'Causes',tre:'Treatment',pre:'Prevention',saf:'Safety',unsure:'Low confidence – please retake a clearer, close-up photo in daylight or pick the disease manually.',
+lead:'Based on the photo, this looks like',rel:'Result reliability',lv:['High','Medium','Low'],iq:'Photo quality',tDark:'Photo is too dark – use daylight',tBri:'Photo is too bright – avoid direct sun glare',tBlur:'Photo looks blurry – hold the camera steady',tSmall:'Leaf looks small – move closer',man:'You chose the disease manually, so reliability is not shown.',rnote:'This is an estimate from photo quality and model confidence. It is not a validated accuracy: the prototype has not been tested on real field images.'},
+hi:{tag:'फोटो और आवाज़ से पौधों की बीमारी की पहचान और सलाह',t1:'1. पौधे की फोटो दें',drop:'प्रभावित पत्ते की फोटो लेने या अपलोड करने के लिए टैप करें',an:'अपलोड करें',cam:'📷 फोटो खींचें',live:'लाइव कैमरा',camErr:'यहाँ लाइव कैमरा बंद है। "फोटो खींचें" दबाएँ या पेज को ब्राउज़र टैब में खोलें।',up:'🖼 ब्राउज़ करें',snap:'फोटो लें',close:'कैमरा बंद करें',s:['नमूना: काले धब्बे','नमूना: सफेद पाउडर','नमूना: पीला पत्ता'],t2:'2. सवाल पूछें',ph:'अपने पौधे के बारे में पूछें…',mic:'🎤 बोलें',micOn:'● सुन रहा है',send:'भेजें',spk:'जवाब बोलकर सुनाएँ',stop:'आवाज़ बंद',conf:'विश्वसनीयता',other:'अन्य संभावनाएँ',ovr:'सही नहीं? खुद चुनें:',
+hello:'नमस्ते! अपने पौधे की फोटो डालें, फिर पूछें कि क्या दिक्कत है या इलाज कैसे करें।',noimg:'कृपया पहले पौधे की फोटो डालें, फिर "जाँच करें" दबाएँ।',noSTT:'इस ब्राउज़र में आवाज़ से पूछना उपलब्ध नहीं है। कृपया टाइप करें (Chrome में बेहतर चलता है)।',
+chips:['यह कौन सी बीमारी है?','इलाज कैसे करें?','इसे कैसे रोकें?','यह क्यों हुआ?','क्या छिड़काव सुरक्षित है?'],
+how:'यह कैसे काम करता है: फोटो → छवि विश्लेषण → ज्ञान आधार → टेक्स्ट और आवाज़ में उत्तर। यह डेमो पूरी तरह आपके ब्राउज़र में चलता है। यहाँ पहचान के लिए हल्का रंग-पैटर्न विश्लेषक है; असली ऐप में यह चरण प्रशिक्षित MobileNetV2 / TensorFlow Lite मॉडल से बदला जाएगा।',
+sum:'सारांश',sym:'लक्षण',cau:'कारण',tre:'उपचार',pre:'रोकथाम',saf:'सुरक्षा',unsure:'विश्वसनीयता कम है – कृपया दिन की रोशनी में पास से साफ फोटो लें या बीमारी खुद चुनें।',
+lead:'फोटो के आधार पर यह लग रहा है',rel:'परिणाम की विश्वसनीयता',lv:['उच्च','मध्यम','कम'],iq:'फोटो की गुणवत्ता',tDark:'फोटो बहुत अंधेरी है – रोशनी में लें',tBri:'फोटो बहुत चमकीली है – सीधी धूप से बचें',tBlur:'फोटो धुंधली है – कैमरा स्थिर रखें',tSmall:'पत्ता छोटा दिख रहा है – पास से लें',man:'आपने बीमारी खुद चुनी है, इसलिए विश्वसनीयता नहीं दिखाई जा रही।',rnote:'यह अनुमान फोटो की गुणवत्ता और मॉडल के भरोसे पर आधारित है। यह प्रमाणित सटीकता नहीं है; प्रोटोटाइप का असली खेत की फोटो पर परीक्षण नहीं हुआ है।'}
+};
+const KB={
+healthy:{n:{en:'Healthy leaf',hi:'स्वस्थ पत्ता'},
+ sym:{en:'Even green colour, no spots, holes or powder.',hi:'एक समान हरा रंग, कोई धब्बा, छेद या पाउडर नहीं।'},
+ cau:{en:'No disease signs found.',hi:'बीमारी के कोई लक्षण नहीं मिले।'},
+ tre:{en:'No treatment needed. Keep watering at the base and check leaves weekly.',hi:'इलाज की ज़रूरत नहीं। जड़ में पानी दें और हर हफ्ते पत्ते जाँचें।'},
+ pre:{en:'Give sunlight, spacing and balanced nutrition; remove dead leaves.',hi:'धूप, उचित दूरी और संतुलित खाद दें; सूखे पत्ते हटाते रहें।'},
+ saf:{en:'—',hi:'—'}},
+early:{n:{en:'Early Blight (Alternaria)',hi:'अर्ली ब्लाइट (अगेती झुलसा)'},
+ sym:{en:'Dark brown spots with ring-like patterns on older leaves, often with a yellow halo.',hi:'पुराने पत्तों पर छल्लेदार गहरे भूरे धब्बे, अक्सर चारों ओर पीला घेरा।'},
+ cau:{en:'Fungus spreading in warm, humid weather, via rain splash and infected plant debris.',hi:'गर्म और नम मौसम में फफूँद, बारिश की छींटों और संक्रमित अवशेषों से फैलती है।'},
+ tre:{en:'Remove infected leaves and burn or bin them. Spray a copper-based or mancozeb fungicide as per label every 7–10 days. Neem oil can help in mild cases.',hi:'संक्रमित पत्ते तोड़कर जलाएँ या फेंकें। लेबल के अनुसार कॉपर-आधारित या मैंकोज़ेब फफूँदनाशक का 7–10 दिन में छिड़काव करें। हल्के मामले में नीम तेल मदद करता है।'},
+ pre:{en:'Keep plants spaced, water at the base not on leaves, stake plants, rotate crops every year and clear fallen debris.',hi:'पौधों के बीच दूरी रखें, पत्तों पर नहीं जड़ में पानी दें, सहारा दें, हर साल फसल बदलें और गिरे अवशेष साफ करें।'},
+ saf:{en:'Wear gloves and mask while spraying; follow the label dose and waiting period before harvest.',hi:'छिड़काव में दस्ताने और मास्क पहनें; लेबल की मात्रा और कटाई से पहले का प्रतीक्षा समय मानें।'}},
+late:{n:{en:'Late Blight (Phytophthora)',hi:'लेट ब्लाइट (पछेती झुलसा)'},
+ sym:{en:'Large dark, water-soaked patches that spread fast; white fuzz underneath in damp weather.',hi:'बड़े गहरे, पानी-सोखे धब्बे जो तेज़ी से फैलते हैं; नमी में नीचे सफेद रुई जैसी परत।'},
+ cau:{en:'Water mould favoured by cool, wet, cloudy weather; spreads by wind and rain.',hi:'ठंडे, गीले, बादल वाले मौसम में पनपने वाली फफूँद; हवा और बारिश से फैलती है।'},
+ tre:{en:'Act quickly: remove and destroy infected plants. Spray a systemic fungicide (e.g. metalaxyl + mancozeb) as per label and ask your local agriculture office.',hi:'जल्दी कदम उठाएँ: संक्रमित पौधे हटाकर नष्ट करें। लेबल के अनुसार सिस्टमिक फफूँदनाशक (जैसे मेटालैक्सिल + मैंकोज़ेब) छिड़कें और स्थानीय कृषि कार्यालय से पूछें।'},
+ pre:{en:'Use resistant varieties, avoid overhead watering, ensure airflow and never compost infected plants.',hi:'रोग-प्रतिरोधी किस्में लगाएँ, ऊपर से पानी न दें, हवा का आवागमन रखें और संक्रमित पौधों की खाद न बनाएँ।'},
+ saf:{en:'Use protective gear; keep sprays away from children, pets and water sources.',hi:'सुरक्षा साधन पहनें; दवा बच्चों, पालतू जानवरों और जल स्रोतों से दूर रखें।'}},
+mildew:{n:{en:'Powdery Mildew',hi:'चूर्णिल आसिता (सफेद पाउडर रोग)'},
+ sym:{en:'White or grey powdery coating on leaves; leaves may curl and turn yellow.',hi:'पत्तों पर सफेद या धूसर पाउडर जैसी परत; पत्ते मुड़ या पीले हो सकते हैं।'},
+ cau:{en:'Fungus favoured by dry days, cool humid nights and crowded plants.',hi:'सूखे दिन, ठंडी नम रातों और घने पौधों में पनपने वाली फफूँद।'},
+ tre:{en:'Remove badly affected leaves. Spray wettable sulphur or a baking-soda solution (1 tsp per litre with a drop of soap); repeat weekly.',hi:'ज़्यादा प्रभावित पत्ते हटाएँ। घुलनशील सल्फर या बेकिंग सोडा घोल (1 चम्मच प्रति लीटर, एक बूँद साबुन) का साप्ताहिक छिड़काव करें।'},
+ pre:{en:'Prune for airflow, avoid excess nitrogen, give morning sun and water at the base.',hi:'हवा के लिए छँटाई करें, ज़्यादा नाइट्रोजन से बचें, सुबह की धूप दें और जड़ में पानी दें।'},
+ saf:{en:'Do not spray sulphur in very hot weather (above 35°C); it can burn leaves.',hi:'बहुत गर्मी (35°C से ऊपर) में सल्फर न छिड़कें; पत्ते जल सकते हैं।'}},
+rust:{n:{en:'Leaf Rust',hi:'पत्ती रतुआ (रस्ट)'},
+ sym:{en:'Orange-rust coloured pustules on leaves that rub off as powder.',hi:'पत्तों पर नारंगी-जंग रंग के उभार जो पाउडर की तरह झड़ते हैं।'},
+ cau:{en:'Rust fungus spread by wind spores in humid conditions.',hi:'नमी में हवा के बीजाणुओं से फैलने वाली रतुआ फफूँद।'},
+ tre:{en:'Pick off infected leaves, then spray propiconazole or a copper fungicide per label.',hi:'संक्रमित पत्ते तोड़ें, फिर लेबल के अनुसार प्रोपिकोनाज़ोल या कॉपर फफूँदनाशक छिड़कें।'},
+ pre:{en:'Avoid wet leaves, space plants well, and clear fallen leaves.',hi:'पत्ते गीले न रखें, पौधों में दूरी रखें और गिरे पत्ते साफ करें।'},
+ saf:{en:'Wear gloves and a mask; respect the harvest waiting period.',hi:'दस्ताने और मास्क पहनें; कटाई से पहले का प्रतीक्षा समय मानें।'}},
+nitro:{n:{en:'Nutrient Deficiency (yellowing)',hi:'पोषक तत्वों की कमी (पीलापन)'},
+ sym:{en:'Leaves turn pale yellow, usually older leaves first, with no spots or mould.',hi:'पत्ते हल्के पीले पड़ते हैं, आमतौर पर पुराने पहले; कोई धब्बा या फफूँद नहीं।'},
+ cau:{en:'Lack of nitrogen or iron, overwatering, poor drainage or root damage.',hi:'नाइट्रोजन या आयरन की कमी, ज़्यादा पानी, खराब जल निकासी या जड़ को नुकसान।'},
+ tre:{en:'Add compost, vermicompost or a balanced NPK/urea dose; improve drainage and reduce watering.',hi:'कम्पोस्ट, वर्मीकम्पोस्ट या संतुलित NPK/यूरिया दें; जल निकासी सुधारें और पानी कम करें।'},
+ pre:{en:'Feed regularly with organic manure, test soil yearly, avoid waterlogging.',hi:'नियमित जैविक खाद दें, हर साल मिट्टी जाँचें, जलभराव से बचें।'},
+ saf:{en:'Follow fertilizer doses; excess burns roots.',hi:'खाद की मात्रा मानें; ज़्यादा देने से जड़ें जल जाती हैं।'}}
+};
+const KEYS=Object.keys(KB);
+const U=()=>UI[lang];
+
+/* ---------- image analysis (colour-pattern classifier) ---------- */
+function features(img){
+  const c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d');x.drawImage(img,0,0,96,96);
+  const d=x.getImageData(0,0,96,96).data;let n=0,f={green:0,yellow:0,dark:0,white:0,rust:0};
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),df=mx-mn;
+    let h=0;if(df){h=mx==r?((g-b)/df)%6:mx==g?(b-r)/df+2:(r-g)/df+4;h*=60;if(h<0)h+=360}
+    const s=mx?df/mx:0,v=mx;n++;
+    if(v>.8&&s<.18)f.white++;
+    else if(v<.28)f.dark++;
+    else if(h>=15&&h<40&&s>.55&&v>.55)f.rust++;
+    else if(h>=15&&h<40&&s>.3&&v<=.55)f.dark++;
+    else if(h>=40&&h<70&&s>.35)f.yellow++;
+    else if(h>=70&&h<170&&s>.2)f.green++;
+  }
+  for(const k in f)f[k]/=n;return f;
+}
+function classify(f){
+  const sc={
+    healthy:Math.max(0,f.green-1.5*(f.dark+f.white+f.rust+f.yellow)),
+    early:f.dark*5+(f.dark>.04&&f.dark<.2?.3:0),
+    late:f.dark>.2?f.dark*3:f.dark*1.2,
+    mildew:f.white*5.5,
+    rust:f.rust*6,
+    nitro:f.yellow*2.4
+  };
+  let arr=Object.entries(sc).map(([k,v])=>[k,Math.max(v,.001)]);
+  const tot=arr.reduce((a,b)=>a+b[1],0);
+  arr=arr.map(([k,v])=>[k,v/tot]).sort((a,b)=>b[1]-a[1]);return arr;
+}
+
+/* ---------- reliability ---------- */
+let lastQ=null;
+function quality(img){
+  const c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d');x.drawImage(img,0,0,96,96);
+  const d=x.getImageData(0,0,96,96).data,L=new Float32Array(9216);let m=0,nw=0;
+  for(let i=0;i<9216;i++){const r=d[i*4],g=d[i*4+1],b=d[i*4+2];L[i]=(0.299*r+0.587*g+0.114*b)/255;m+=L[i];const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(!(mx>204&&(mx-mn)/mx<.18))nw++}
+  m/=9216;let gr=0;for(let y=0;y<95;y++)for(let xx=0;xx<95;xx++){const i=y*96+xx;gr+=Math.abs(L[i]-L[i+1])+Math.abs(L[i]-L[i+96])}
+  gr/=9025*2;
+  const b=1-Math.min(1,Math.abs(m-.5)/.4),s=Math.min(1,gr/.03),cv=Math.min(1,(nw/9216)/.4);
+  return{score:(b+s+cv)/3,m,gr,cov:nw/9216};
+}
+function relBlock(){
+  const u=U();
+  if(cur.manual)return `<div class="alt">${u.man}</div>`;
+  const q=cur.q?cur.q.score:.5;
+  const r=.6*Math.min(1,cur.conf/.8)+.4*q,p=Math.round(r*100),lv=r>=.7?0:r>=.45?1:2,qp=Math.round(q*100);
+  const tips=[];
+  if(cur.q){if(cur.q.m<.25)tips.push(u.tDark);if(cur.q.m>.8)tips.push(u.tBri);if(cur.q.gr<.012)tips.push(u.tBlur);if(cur.q.cov<.15)tips.push(u.tSmall)}
+  return `<div class="cf" style="margin-top:8px"><span>${u.rel}: <b>${u.lv[lv]}</b> (${p}%)</span><div class="bar"><i style="width:${p}%"></i></div></div>`+
+   `<div class="cf"><span>${u.iq} ${qp}%</span><div class="bar"><i style="width:${qp}%"></i></div></div>`+
+   (tips.length?`<div class="alt">💡 ${tips.join(' • ')}</div>`:'')+`<div class="alt">${u.rnote}</div>`;
+}
+
+/* ---------- UI ---------- */
+function setImg(src){
+  const im=new Image();im.onload=()=>{const d=$('drop');d.innerHTML='';im.alt='plant';d.appendChild(im);imgReady=im;window._im=im;analyze()};im.src=src;
+}
+$('file').onchange=e=>{const f=e.target.files[0];if(f)setImg(URL.createObjectURL(f))};
+$('analyze').onclick=()=>analyze();
+function sample(kind){
+  const c=document.createElement('canvas');c.width=c.height=300;const x=c.getContext('2d');
+  x.fillStyle='#d8d3c4';x.fillRect(0,0,300,300);
+  x.fillStyle=kind==2?'#c9c23a':'#2f8f3c';x.beginPath();x.ellipse(150,150,125,95,.5,0,7);x.fill();
+  const rnd=(function(s){return()=>(s=Math.sin(s)*10000,s-Math.floor(s))})(kind+3);
+  const blot=(col,cnt,rad)=>{x.fillStyle=col;for(let i=0;i<cnt;i++){const a=rnd()*6.28,r=Math.sqrt(rnd())*80;x.beginPath();x.arc(150+Math.cos(a)*r*1.3,150+Math.sin(a)*r*.9,rad*(.5+rnd()),0,7);x.fill()}};
+  if(kind==0)blot('#3b2414',35,9);
+  if(kind==1)blot('#f4f4f0',80,12);
+  setImg(c.toDataURL());
+}
+$('s1').onclick=()=>sample(0);$('s2').onclick=()=>sample(1);$('s3').onclick=()=>sample(2);
+
+function analyze(manual){
+  if(!window._im&&!manual){add('a',U().noimg);return}
+  let arr;
+  if(manual){arr=[[manual,.9]]}else{arr=classify(features(window._im))}
+  if(!manual&&window._im)lastQ=quality(window._im);cur={key:arr[0][0],conf:arr[0][1],alts:arr.slice(1,3),manual:!!manual,q:lastQ};
+  $('sel').value=cur.key;render();
+  const k=KB[cur.key],u=U();
+  const msg=`${u.lead}: ${k.n[lang]}.\n${k.sym[lang]}`;
+  add('a',msg);
+}
+function render(){
+  const u=U();if(!cur){$('res').innerHTML='';return}
+  const k=KB[cur.key],p=Math.round(cur.conf*100);
+  $('res').innerHTML=`<h3>${k.n[lang]}</h3><div class="cf"><span>${u.conf} ${p}%</span><div class="bar"><i style="width:${p}%"></i></div></div>`+
+  (cur.alts.length?`<div class="alt">${u.other}: ${cur.alts.map(a=>KB[a[0]].n[lang]+' '+Math.round(a[1]*100)+'%').join(', ')}</div>`:'')+
+  relBlock()+(cur.conf<.5?`<div class="warn">${u.unsure}</div>`:'');
+}
+$('sel').onchange=e=>analyze(e.target.value);
+
+/* ---------- camera ---------- */
+let stream=null;
+function closeCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('camBox').classList.add('hidden')}
+$('upBtn').onclick=()=>$('file').click();
+$('cam').onchange=e=>{const f=e.target.files[0];if(f)setImg(URL.createObjectURL(f));e.target.value=''};
+$('camBtn').onclick=async()=>{
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('cam').click();return}
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    $('vid').srcObject=stream;$('camBox').classList.remove('hidden');$('camNote').classList.add('hidden');
+  }catch(err){showCamNote();$('cam').click()}
+};
+$('snap').onclick=()=>{
+  const v=$('vid');if(!v.videoWidth)return;
+  const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
+  closeCam();setImg(c.toDataURL('image/jpeg',.9));
+};
+$('camClose').onclick=closeCam;
+function showCamNote(){
+  const n=$('camNote');n.textContent=lang==='hi'?'लाइव कैमरा Claude के प्रीव्यू में उपलब्ध नहीं है। फ़ाइल डाउनलोड करके Chrome में खोलें, या ब्राउज़ करें।':'Live camera is not available inside Claude\'s preview. Download the app file and open it in Chrome to use your webcam, or use Browse.';n.classList.remove('hidden');return;
+  const b=document.createElement('button');b.className='b';b.textContent=lang==='hi'?'नई टैब में खोलें':'Open in new tab';
+  b.onclick=()=>window.open(location.href,'_blank');n.appendChild(b);n.classList.remove('hidden');
+}
+
+/* ---------- Q&A ---------- */
+const INTENT=[
+ ['tre',/treat|cure|spray|medicine|fungicide|remedy|what (should|do) i do|how.*(fix|solve|save)|इलाज|उपचार|दवा|दवाई|छिड़क|क्या करूं|क्या करें|ठीक/i],
+ ['pre',/prevent|avoid|again|future|stop|रोक|बचाव|बचा|दोबारा|फिर से/i],
+ ['cau',/why|cause|reason|how did|क्यों|कारण|वजह|कैसे हुआ/i],
+ ['saf',/safe|safety|danger|harm|child|pet|सुरक्षित|सुरक्षा|खतरा|नुकसान/i],
+ ['sym',/symptom|sign|look like|लक्षण|निशान/i],
+ ['sum',/what|which|disease|problem|wrong|identify|कौन|कौन सी|क्या है|बीमारी|दिक्कत|समस्या|पीले|धब्बे/i]
+];
+function answer(q){
+  const u=U();
+  if(!cur)return u.noimg;
+  const k=KB[cur.key];let it='sum';
+  for(const [i,re] of INTENT)if(re.test(q)){it=i;break}
+  if(it==='sum')return `${k.n[lang]} (${Math.round(cur.conf*100)}%).\n${u.sym}: ${k.sym[lang]}\n${u.tre}: ${k.tre[lang]}`;
+  const lab={tre:u.tre,pre:u.pre,cau:u.cau,saf:u.saf,sym:u.sym}[it];
+  return `${k.n[lang]} — ${lab}:\n${k[it][lang]}`;
+}
+function add(w,t,silent){
+  const d=document.createElement('div');d.className='m '+w;d.textContent=t;$('chat').appendChild(d);$('chat').scrollTop=1e5;
+  if(w==='a'&&!silent&&$('speak').checked)say(t);
+}
+function ask(q){q=q.trim();if(!q)return;add('u',q);$('q').value='';add('a',answer(q))}
+$('send').onclick=()=>ask($('q').value);
+$('q').onkeydown=e=>{if(e.key==='Enter')ask($('q').value)};
+
+/* ---------- voice ---------- */
+function say(t){
+  if(!('speechSynthesis' in window))return;speechSynthesis.cancel();
+  const s=new SpeechSynthesisUtterance(t.replace(/\n/g,'. '));s.lang=lang==='hi'?'hi-IN':'en-IN';s.rate=.95;
+  const v=speechSynthesis.getVoices().find(v=>v.lang.replace('_','-').startsWith(s.lang))||speechSynthesis.getVoices().find(v=>v.lang.startsWith(lang));
+  if(v)s.voice=v;speechSynthesis.speak(s);
+}
+$('stop').onclick=()=>speechSynthesis&&speechSynthesis.cancel();
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+$('mic').onclick=()=>{
+  if(!SR){add('a',U().noSTT);return}
+  if(rec){rec.stop();return}
+  rec=new SR();rec.lang=lang==='hi'?'hi-IN':'en-IN';rec.interimResults=false;
+  rec.onstart=()=>{$('mic').setAttribute('aria-pressed','true');$('mic').textContent=U().micOn};
+  rec.onresult=e=>ask(e.results[0][0].transcript);
+  rec.onend=()=>{rec=null;$('mic').setAttribute('aria-pressed','false');$('mic').textContent=U().mic};
+  rec.onerror=()=>{};rec.start();
+};
+
+/* ---------- language ---------- */
+function applyLang(first){
+  const u=U();document.documentElement.lang=lang;
+  $('lEn').setAttribute('aria-pressed',lang==='en');$('lHi').setAttribute('aria-pressed',lang==='hi');
+  $('tag').textContent=u.tag;$('t1').textContent=u.t1;$('t2').textContent=u.t2;
+  if(!window._im)$('dropT')&&($('dropT').textContent=u.drop);
+  $('analyze').textContent=u.an;$('camBtn').textContent=u.cam;$('upBtn').textContent=u.up;$('snap').textContent=u.snap;$('camClose').textContent=u.close;['s1','s2','s3'].forEach((id,i)=>$(id).textContent=u.s[i]);
+  $('q').placeholder=u.ph;$('mic').textContent=rec?u.micOn:u.mic;$('send').textContent=u.send;$('spkL').textContent=u.spk;$('stop').textContent=u.stop;
+  $('ovrL').textContent=u.ovr;$('how').textContent=u.how;
+  $('vnote').textContent=SR?'':u.noSTT;
+  $('sel').innerHTML=KEYS.map(k=>`<option value="${k}">${KB[k].n[lang]}</option>`).join('');if(cur)$('sel').value=cur.key;
+  $('chips').innerHTML='';u.chips.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.onclick=()=>ask(c);$('chips').appendChild(b)});
+  render();
+}
+function setLang(l){lang=l;applyLang();add('a',l==='hi'?'भाषा हिन्दी में बदल गई।':'Language set to English.');if(cur)add('a',KB[cur.key].n[lang]+': '+KB[cur.key].sym[lang],true)}
+$('lEn').onclick=()=>setLang('en');$('lHi').onclick=()=>setLang('hi');
+applyLang();add('a',U().hello,true);
+if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=()=>{};
+</script>
+</body>
+</html>
