@@ -26,18 +26,21 @@ import matplotlib.pyplot as plt
 IMG = 224
 EXTS = {".jpg", ".jpeg", ".png"}
 
+
 def list_files(data_dir):
-       root = pathlib.Path(data_dir)
-       classes, paths, labels = [], [], []
-       for c in sorted(p for p in root.iterdir() if p.is_dir()):
-           files = [f for f in c.iterdir() if f.suffix.lower() in EXTS]
-           if not files:
-               continue  # skip empty or nested folders
-           for f in files:
-               paths.append(str(f))
-               labels.append(len(classes))
-           classes.append(c.name)
-       return classes, np.array(paths), np.array(labels)
+    root = pathlib.Path(data_dir)
+    classes, paths, labels = [], [], []
+    for c in sorted(p for p in root.iterdir() if p.is_dir()):
+        if c.name == root.name:
+            continue  # skip a nested folder with the same name as the dataset root
+        files = [f for f in c.iterdir() if f.suffix.lower() in EXTS]
+        if not files:
+            continue  # skip empty or nested folders
+        for f in files:
+            paths.append(str(f))
+            labels.append(len(classes))
+        classes.append(c.name)
+    return classes, np.array(paths), np.array(labels)
 
 
 def make_ds(paths, labels, batch, shuffle):
@@ -98,7 +101,11 @@ def main():
     model, base = build_model(len(classes))
     model.compile(optimizer=keras.optimizers.Adam(1e-3),
                   loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-    model.fit(train, validation_data=val, epochs=a.epochs)
+    cb = [
+        keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=3, restore_best_weights=True),
+        keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.3, patience=1, verbose=1),
+    ]
+    model.fit(train, validation_data=val, epochs=a.epochs, callbacks=cb)
 
     if a.fine_tune_epochs > 0:  # unfreeze the top of MobileNetV2
         base.trainable = True
@@ -106,7 +113,7 @@ def main():
             layer.trainable = False
         model.compile(optimizer=keras.optimizers.Adam(1e-5),
                       loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-        model.fit(train, validation_data=val, epochs=a.fine_tune_epochs)
+        model.fit(train, validation_data=val, epochs=a.fine_tune_epochs, callbacks=cb)
 
     # ---- honest evaluation on the held-out test set ----
     probs = model.predict(test)
@@ -140,3 +147,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
